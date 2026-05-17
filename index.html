@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Денчик—аватарки-дизайн</title>
+    <!-- Font Awesome 6 (Free CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* улучшает ощущения на мобилках, но текст можно копировать через выделение */
+        }
+
+        body {
+            background-color: #0a0c12;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            color: #eef5ff;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Кастомный скролл */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #11161f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #7b2f9d;
+            border-radius: 12px;
+        }
+
+        /* Фоновый канвас (матричный эффект) */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.35;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Контент поверх фона */
+        .section, .footer, #intro {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Десктопное сообщение – изначально скрыто, показываем только если ширина < 768? 
+           наоборот: классический адаптив — сайт доступен везде, но сообщение для старых или очень узких?
+           по заданию нужно адаптировать под МОБИЛЬНУЮ и КОМПЬЮТЕРНУЮ версию. Убираем блокировку.
+           Сделаем деликатный баннер, если ширина меньше 500px? Нет, просто убираем жёсткое сообщение, заменяем адаптивом.
+           Для полной кросс-платформенности удаляем #desktop-message или скрываем через CSS. Переделаем: сайт полностью доступен везде.
+        */
+        #desktop-message {
+            display: none;
+        }
+
+        /* Вступление с анимацией текста */
+        #intro {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #05070b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 1s cubic-bezier(0.23, 1, 0.32, 1), visibility 0s;
+            backdrop-filter: blur(4px);
+        }
+        #intro.hide-intro {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        #resolve-text {
+            font-size: clamp(1.5rem, 8vw, 3.5rem);
+            font-weight: 600;
+            letter-spacing: 6px;
+            background: linear-gradient(135deg, #b77eff, #d45eff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            font-family: monospace;
+            text-transform: uppercase;
+            white-space: nowrap;
+            animation: glitch 0.6s infinite alternate;
+        }
+        @keyframes glitch {
+            0% { text-shadow: -2px 0 #ff00c1, 2px 0 #00fff9; opacity: 0.9;}
+            100% { text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9; opacity: 1;}
+        }
+
+        /* Главные секции */
+        .section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.1), transform 0.8s ease;
+        }
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Имя / титул */
+        .name {
+            font-size: clamp(3rem, 12vw, 6rem);
+            font-weight: 800;
+            background: linear-gradient(120deg, #fff, #cb6eff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        .profession {
+            font-size: clamp(1rem, 4vw, 1.6rem);
+            color: #b9c7d9;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            border-bottom: 1px dashed rgba(203, 110, 255, 0.5);
+            display: inline-block;
+            padding-bottom: 0.4rem;
+        }
+
+        /* Контактные кнопки */
+        .contact-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0 4rem;
+        }
+        .contact-btn {
+            background: rgba(20, 25, 35, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(203, 110, 255, 0.5);
+            padding: 0.9rem 1.8rem;
+            border-radius: 60px;
+            color: #f0f3fa;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.25s ease;
+            font-size: 1rem;
+            letter-spacing: 0.3px;
+        }
+        .contact-btn i {
+            font-size: 1.2rem;
+        }
+        .contact-btn:hover {
+            background: #7b2f9d;
+            border-color: #e5a0ff;
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(123, 47, 157, 0.4);
+        }
+
+        /* скролл индикатор */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #aaa;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .scroll-indicator i {
+            font-size: 1.4rem;
+            color: #cb6eff;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); opacity: 0.6; }
+            50% { transform: translateY(8px); opacity: 1; }
+        }
+
+        /* about секция */
+        .about-title, .music-title {
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 2rem;
+            background: linear-gradient(145deg, #e2c6ff, #a162ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .about-content {
+            max-width: 720px;
+            background: rgba(12, 16, 24, 0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            padding: 2rem;
+            border: 1px solid rgba(203, 110, 255, 0.2);
+            margin-bottom: 2rem;
+        }
+        .about-content p {
+            font-size: clamp(0.95rem, 3vw, 1.2rem);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            color: #dfe9ff;
+        }
+
+        .quote {
+            max-width: 650px;
+            font-style: italic;
+            padding: 1.5rem 2rem;
+            border-left: 4px solid #cb6eff;
+            background: rgba(0,0,0,0.4);
+            border-radius: 1.5rem;
+            font-weight: 500;
+            font-size: clamp(0.9rem, 3.5vw, 1.2rem);
+            margin: 1.5rem auto;
+            color: #cdd9ff;
+        }
+
+        /* Музыкальный слайдер — адаптивный, плавный */
+        .music-slider {
+            width: 100%;
+            max-width: 1000px;
+            margin: 2rem auto;
+            position: relative;
+            overflow: hidden;
+            border-radius: 2rem;
+        }
+        .slider-container {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            gap: 20px;
+            padding: 1rem 0.5rem;
+        }
+        .music-card {
+            flex: 0 0 calc(100% - 20px);
+            background: linear-gradient(145deg, #131a24, #0c111a);
+            border-radius: 2rem;
+            padding: 2rem 1rem;
+            text-align: center;
+            border: 1px solid #2a2f3e;
+            box-shadow: 0 25px 35px -12px rgba(0,0,0,0.5);
+            transition: 0.3s;
+            backdrop-filter: blur(4px);
+        }
+        @media (min-width: 768px) {
+            .music-card {
+                flex: 0 0 calc(50% - 20px);
+            }
+        }
+        @media (min-width: 1024px) {
+            .music-card {
+                flex: 0 0 calc(33.33% - 20px);
+            }
+        }
+        .music-card i {
+            font-size: 3rem;
+            color: #cb6eff;
+            margin-bottom: 1rem;
+        }
+        .music-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+        }
+        .music-card p {
+            color: #acb8d0;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        .note-badge {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            background: #1e1f2c;
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 60px;
+        }
+
+        /* ноты анимация */
+        .notes-container {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            pointer-events: none;
+            height: 80px;
+            z-index: 3;
+        }
+        .floating-note {
+            position: absolute;
+            bottom: 0;
+            font-size: 1.2rem;
+            color: #cb6eff;
+            opacity: 0.8;
+            animation: floatUp 3s linear forwards;
+            filter: drop-shadow(0 0 3px #ffa0ff);
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.9; }
+            100% { transform: translateY(-70px) rotate(15deg); opacity: 0; }
+        }
+
+        /* навигация слайдера */
+        .slider-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+        .slider-btn {
+            background: #1e2632;
+            border: none;
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 60px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: 0.2s;
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .slider-btn:hover {
+            background: #7b2f9d;
+            transform: scale(1.05);
+        }
+        .slide-indicators {
+            display: flex;
+            gap: 12px;
+        }
+        .indicator {
+            width: 10px;
+            height: 10px;
+            background: #3a4050;
+            border-radius: 10px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .indicator.active {
+            background: #cb6eff;
+            width: 28px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.8rem;
+            color: #7f8c9a;
+            border-top: 1px solid rgba(203, 110, 255, 0.2);
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+        }
+
+        /* адаптив: коррекция отступов */
+        @media (max-width: 550px) {
+            .section {
+                padding: 3rem 1rem;
+            }
+            .contact-btn {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.85rem;
+            }
+            .about-content {
+                padding: 1.2rem;
+            }
+            .music-card h3 {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Убираем конфликт с фоновым канвасом */
+        canvas {
+            display: block;
+        }
+
+        /* плавное появление аудио контролов если нужно */
+        #bg-music {
+            display: none;
+        }
+        /* Добавим пользовательский плеер (невидимый но с возможностью) – улучшение */
+        .audio-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 99;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            border-radius: 40px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border: 1px solid #cb6eff66;
+            transition: 0.2s;
+        }
+        .audio-control i {
+            font-size: 1.3rem;
+            color: white;
+        }
+        .audio-control span {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        @media (max-width: 600px) {
+            .audio-control span { display: none; }
+            .audio-control { padding: 8px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Интро анимация -->
+    <div id="intro">
+        <div id="resolve-text"></div>
+    </div>
+
+    <!-- Основной контент -->
+    <div id="main-content" class="section">
+<div>
+    <h1 class="name">Lildrug</h1>
+    <p class="profession">Денчик/аватарки-дизайн</p>
+    <div class="contact-buttons">
+        <a href="https://t.me/cofficen" class="contact-btn" target="_blank">
+            <i class="fab fa-telegram"></i> Связь
+        </a>
+        <a href="https://t.me/Rgpas12" class="contact-btn" target="_blank">
+            <i class="fab fa-telegram"></i> Канал
+        </a>
+        <a href="https://t.me/+iU4v8QYRvFo2OTIy" class="contact-btn" target="_blank">
+            <i class="fab fa-telegram"></i> Отзывы
+        </a>
+        <a href="http://t.me/lildrugshop_bot" class="contact-btn" target="_blank">
+            <i class="fab fa-telegram-plane"></i> Магазин
+        </a>
+    </div>
+</div>
+
+                    <i class="fab fa-telegram-plane"></i> Магазин
+                </a>
+            </div>
+        </div>
+        <div class="scroll-indicator" id="scroll-down-1">
+            <i class="fas fa-chevron-down"></i>
+            <span>Листайте вниз</span>
+        </div>
+    </div>
+
+    <div id="about" class="section">
+        <h2 class="about-title">О Таносе</h2>
+        <div class="about-content">
+            <p>Танос — это не просто псевдоним, это философия. Я создаю аватарки. все  и других также так же youtube..</p>
+            <p>Мой подход к разработке основан на глубоком понимании потребностей пользователей и стремлении создавать продукты, которые не просто функциональны, но и вдохновляют.</p>
+            <p>От концепции до реализации — я превращаю сложные задачи в интуитивно понятные интерфейсы и надежные системы, которые работают безупречно в любых условиях.</p>
+        </div>
+        <div class="quote" id="cyber-quote">
+            «Бесплатный инструмент? Ты не пользователь — ты источник. Твоя информация — это капитал.»
+        </div>
+        <div class="scroll-indicator" id="scroll-down-2">
+            <i class="fas fa-chevron-down"></i>
+            <span>Листайте дальше</span>
+        </div>
+    </div>
+
+    <div id="music" class="section">
+        <h2 class="music-title">Любимые песни</h2>
+        <div class="music-slider">
+            <div class="slider-container" id="slider-container"></div>
+            <div class="notes-container" id="notes-container"></div>
+        </div>
+        <div class="slider-nav">
+            <button class="slider-btn" id="prev-btn"><i class="fas fa-chevron-left"></i></button>
+            <div class="slide-indicators" id="slide-indicators"></div>
+            <button class="slider-btn" id="next-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2026-2027 Lildrug Studio. Все права защищены.
+    </div>
+
+    <canvas id="matrix-bg"></canvas>
+    <audio id="bg-music" loop preload="auto">
+        <source src="assets/audio/music.mp3" type="audio/mpeg">
+        <!-- Если файл отсутствует, тихо играть без ошибок -->
+    </audio>
+    
+    <!-- плавающая кнопка вкл/выкл фоновой музыки -->
+    <div class="audio-control" id="audio-toggle">
+        <i class="fas fa-music"></i>
+        <span>Фоновая музыка</span>
+    </div>
+
+    <script>
+        (function() {
+            // 1. Матричный фон (адаптивный canvas)
+            const canvas = document.getElementById('matrix-bg');
+            let ctx = canvas.getContext('2d');
+            let width, height;
+            let drops = [];
+            let matrixChars = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン01TANOS";
+            
+            function initMatrix() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                const columns = Math.floor(width / 28);
+                drops = [];
+                for(let i = 0; i < columns; i++) {
+                    drops[i] = Math.random() * -height;
+                }
+            }
+            
+            function drawMatrix() {
+                if(!ctx) return;
+                ctx.fillStyle = "rgba(5, 7, 12, 0.07)";
+                ctx.fillRect(0, 0, width, height);
+                ctx.fillStyle = "#7b2f9d";
+                ctx.font = `${Math.min(22, width/30)}px "Monaco", monospace`;
+                for(let i = 0; i < drops.length; i++) {
+                    const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+                    const x = i * 28;
+                    const y = drops[i] * 24;
+                    if(y > 0 && y < height) {
+                        ctx.fillStyle = `rgba(180, 100, 255, ${Math.random() * 0.5 + 0.3})`;
+                        ctx.fillText(text, x, y);
+                    }
+                    if(drops[i] * 24 > height && Math.random() > 0.98) {
+                        drops[i] = 0;
+                    }
+                    drops[i] += 0.5;
+                }
+                requestAnimationFrame(drawMatrix);
+            }
+            
+            function resizeCanvas() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                const columns = Math.floor(width / 28);
+                drops = [];
+                for(let i = 0; i < columns; i++) drops[i] = Math.random() * -height;
+            }
+            
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                initMatrix();
+            });
+            initMatrix();
+            drawMatrix();
+            
+            // 2. Интро анимация с печатным текстом
+            const introDiv = document.getElementById('intro');
+            const resolveText = document.getElementById('resolve-text');
+            let introTimer;
+            const textArr = ["TANOS ///", "SYSTEM://INIT", "DEV_READY", "TANOS_ACTIVE"];
+            let step = 0;
+            function typeIntro() {
+                let full = textArr[step % textArr.length];
+                let i = 0;
+                resolveText.textContent = '';
+                function typing() {
+                    if(i < full.length) {
+                        resolveText.textContent += full[i];
+                        i++;
+                        setTimeout(typing, 80);
+                    } else {
+                        step++;
+                        setTimeout(() => {
+                            if(step < 6) typeIntro();
+                            else {
+                                introDiv.classList.add('hide-intro');
+                                // запустить фоновую музыку если разрешено
+                                initMusicPermission();
+                            }
+                        }, 500);
+                    }
+                }
+                typing();
+            }
+            typeIntro();
+            
+            // 3. Музыкальный плеер и плавный слайдер
+            const songs = [
+                { title: "Blinding Lights", artist: "The Weeknd", icon: "fa-moon", note: "Synthwave" },
+                { title: "Midnight City", artist: "M83", icon: "fa-city", note: "Electronic" },
+                { title: "After Dark", artist: "Mr.Kitty", icon: "fa-cloud-moon", note: "Synth-pop" },
+                { title: "Resonance", artist: "Home", icon: "fa-rocket", note: "Retrowave" },
+                { title: "FLASH", artist: "C418", icon: "fa-head-side-headphones", note: "Ambient" }
+            ];
+            
+            let currentIndex = 0;
+            let visibleCards = 1;
+            function updateVisibleCards() {
+                const w = window.innerWidth;
+                if(w >= 1024) visibleCards = 3;
+                else if(w >= 768) visibleCards = 2;
+                else visibleCards = 1;
+            }
+            
+            const sliderContainer = document.getElementById('slider-container');
+            const indicatorsContainer = document.getElementById('slide-indicators');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            let totalSlides = 0;
+            
+            function buildSlides() {
+                sliderContainer.innerHTML = '';
+                songs.forEach((song, idx) => {
+                    const card = document.createElement('div');
+                    card.className = 'music-card';
+                    card.innerHTML = `
+                        <i class="fas ${song.icon}"></i>
+                        <h3>${song.title}</h3>
+                        <p>${song.artist}</p>
+                        <div class="note-badge">🎵 ${song.note}</div>
+                    `;
+                    sliderContainer.appendChild(card);
+                });
+                totalSlides = songs.length;
+                updateIndicators();
+                updateSliderTransform();
+            }
+            
+            function updateIndicators() {
+                indicatorsContainer.innerHTML = '';
+                const totalIndicators = Math.ceil(totalSlides / visibleCards);
+                for(let i = 0; i < totalIndicators; i++) {
+                    const dot = document.createElement('div');
+                    dot.classList.add('indicator');
+                    if(i === currentIndex) dot.classList.add('active');
+                    dot.addEventListener('click', () => {
+                        currentIndex = i;
+                        updateSliderTransform();
+                        updateIndicators();
+                    });
+                    indicatorsContainer.appendChild(dot);
+                }
+            }
+            
+            function updateSliderTransform() {
+                if(!sliderContainer) return;
+                const cardWidth = sliderContainer.children[0]?.offsetWidth || 300;
+                const gap = 20;
+                const shift = currentIndex * (cardWidth + gap);
+                sliderContainer.style.transform = `translateX(-${shift}px)`;
+                updateIndicators();
+                generateFloatingNotes();
+            }
+            
+            function nextSlide() {
+                const maxIndex = Math.ceil(totalSlides / visibleCards) - 1;
+                if(currentIndex < maxIndex) {
+                    currentIndex++;
+                    updateSliderTransform();
+                } else {
+                    currentIndex = 0;
+                    updateSliderTransform();
+                }
+                updateIndicators();
+            }
+            
+            function prevSlide() {
+                const maxIndex = Math.ceil(totalSlides / visibleCards) - 1;
+                if(currentIndex > 0) {
+                    currentIndex--;
+                    updateSliderTransform();
+                } else {
+                    currentIndex = maxIndex;
+                    updateSliderTransform();
+                }
+                updateIndicators();
+            }
+            
+            // анимация нот при смене трека
+            function generateFloatingNotes() {
+                const notesContainer = document.getElementById('notes-container');
+                for(let i = 0; i < 5; i++) {
+                    const note = document.createElement('div');
+                    note.className = 'floating-note';
+                    note.innerHTML = ['♪', '♫', '🎵', '🎶'][Math.floor(Math.random()*4)];
+                    note.style.left = Math.random() * 90 + '%';
+                    note.style.fontSize = (Math.random() * 20 + 12) + 'px';
+                    note.style.animationDuration = (Math.random() * 1.5 + 1.8) + 's';
+                    notesContainer.appendChild(note);
+                    setTimeout(() => { if(note && note.remove) note.remove(); }, 3000);
+                }
+            }
+            
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+            window.addEventListener('resize', () => {
+                updateVisibleCards();
+                buildSlides();
+                currentIndex = 0;
+                updateSliderTransform();
+            });
+            updateVisibleCards();
+            buildSlides();
+            
+            // 4. Плавная прокрутка + анимация появления секций
+            const sections = document.querySelectorAll('.section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.2, rootMargin: "0px 0px -50px 0px" });
+            sections.forEach(sec => observer.observe(sec));
+            // принудительно проверить видимость после загрузки
+            setTimeout(() => {
+                sections.forEach(sec => {
+                    const rect = sec.getBoundingClientRect();
+                    if(rect.top < window.innerHeight - 100) sec.classList.add('visible');
+                });
+            }, 400);
+            
+            // скролл по клику на индикаторы
+            document.querySelectorAll('.scroll-indicator').forEach(el => {
+                el.addEventListener('click', () => {
+                    const nextSection = el.closest('.section')?.nextElementSibling;
+                    if(nextSection && nextSection.classList.contains('section')) {
+                        nextSection.scrollIntoView({ behavior: 'smooth' });
+                    } else if(el.id === 'scroll-down-1') {
+                        document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+                    } else if(el.id === 'scroll-down-2') {
+                        document.getElementById('music')?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+            
+            // 5. Фоновая музыка (с проверкой автоплея + кнопка)
+            const bgAudio = document.getElementById('bg-music');
+            const audioToggle = document.getElementById('audio-toggle');
+            let musicEnabled = false;
+            function initMusicPermission() {
+                // попытка включить музыку только после взаимодействия
+                const tryPlay = () => {
+                    if(bgAudio && bgAudio.src && bgAudio.src.includes('music.mp3')) {
+                        bgAudio.volume = 0.3;
+                        bgAudio.play().then(() => {
+                            musicEnabled = true;
+                            audioToggle.innerHTML = '<i class="fas fa-volume-up"></i><span>Музыка играет</span>';
+                        }).catch(() => {});
+                    } else {
+                        // если нет файла - просто прячем или меняем иконку
+                        audioToggle.style.opacity = "0.5";
+                        audioToggle.style.pointerEvents = "none";
+                    }
+                };
+                document.body.addEventListener('click', function once() {
+                    if(!musicEnabled) tryPlay();
+                    document.body.removeEventListener('click', once);
+                }, { once: true });
+            }
+            
+            audioToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if(!bgAudio.src || !bgAudio.src.includes('music.mp3')) {
+                    audioToggle.style.opacity = "0.6";
+                    return;
+                }
+                if(bgAudio.paused) {
+                    bgAudio.play().then(() => {
+                        musicEnabled = true;
+                        audioToggle.innerHTML = '<i class="fas fa-volume-up"></i><span>Музыка играет</span>';
+                    }).catch(() => {});
+                } else {
+                    bgAudio.pause();
+                    musicEnabled = false;
+                    audioToggle.innerHTML = '<i class="fas fa-music"></i><span>Фоновая музыка</span>';
+                }
+            });
+            
+            // предзагрузка попытки
+            setTimeout(() => {
+                if(bgAudio.src && bgAudio.src.includes('music.mp3')) {
+                    bgAudio.load();
+                } else {
+                    // если нет трека — кнопка без функционала заглушка, но не ломаем UI
+                    audioToggle.style.cursor = "default";
+                    audioToggle.style.opacity = "0.5";
+                }
+            }, 200);
+            
+            // добавить доп плавные эффекты для слайдера при ресайзе
+            window.dispatchEvent(new Event('resize'));
+        })();
+    </script>
+</body>
+</html>
